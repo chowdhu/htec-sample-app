@@ -34,6 +34,7 @@ jobs:
       name: 'gcloud config docker'
       run: |-
         gcloud auth configure-docker
+    - id: 'tag'
       name: 'tag and push'
       run: |-
         export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
