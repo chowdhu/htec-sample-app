@@ -12,12 +12,9 @@ env:
   REGISTRY_HOSTNAME: gcr.io
   PROJECT_NAME: sri-chowdhury-gcp
 jobs:
-  job_id:
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-    build:
-      runs-on: ubuntu-latest
+  setupbuild:
+    name: "Setup Build and package and upload"
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
