@@ -41,4 +41,4 @@ jobs:
         echo $TAG
         docker images
         docker tag "$IMAGE":"$TAG" "$REGISTRY_HOSTNAME"/"$PROJECT_NAME"/"$IMAGE":"$TAG"
-        docker push "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG"
+        docker push "$REGISTRY_HOSTNAME"/"$PROJECT_NAME"/"$IMAGE":"$TAG"
