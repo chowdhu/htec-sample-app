@@ -5,14 +5,41 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-
+env:
+  GITHUB_SHA: ${{ github.sha }} 
+  GITHUB_REF: ${{ github.ref }} 
+  IMAGE: frontend
+  REGISTRY_HOSTNAME: gcr.io
+  PROJECT_NAME: sri-chowdhury-gcp
 jobs:
-
+  job_id:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
   build:
-
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      run: |-
+        export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
+        echo $TAG
+        docker build . --file Dockerfile --tag "$IMAGE":"$TAG"
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v0'
+      with:
+        credentials_json: '${{ secrets.GCR_KEY }}'
+    - name: 'Setup Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v0'
+    - id: 'gloud'
+      name: 'gcloud config docker'
+      run: |-
+        gcloud auth configure-docker
+      name: 'tag and push'
+      run: |-
+        export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
+        echo $TAG
+        docker tag "$IMAGE":"$TAG" "$REGISTRY_HOSTNAME"/"$PROJECT_NAME"/"$IMAGE":"$TAG"
+        docker push "$REGISTRY_HOSTNAME"/"$IMAGE":"$TAG"
