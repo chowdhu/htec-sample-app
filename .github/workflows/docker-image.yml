@@ -8,7 +8,8 @@ on:
 env:
   GITHUB_SHA: ${{ github.sha }} 
   GITHUB_REF: ${{ github.ref }} 
-  IMAGE: frontend
+  IMAGE_NAME: frontend
+  IMAGE_TAG: ${{ github.sha }} 
   REGISTRY_HOSTNAME: gcr.io
   PROJECT_NAME: ${{ secrets.GCP_PROJECT }}
 jobs:
@@ -22,7 +23,7 @@ jobs:
       run: |-
         export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
         echo $TAG
-        docker build . --file Dockerfile --tag "$IMAGE":"$GITHUB_SHA"
+        docker build . --file Dockerfile --tag "$IMAGE":"$IMAGE_TAG"
     - id: 'auth'
       name: 'Authenticate to Google Cloud'
       uses: 'google-github-actions/auth@v0'
@@ -40,5 +41,19 @@ jobs:
         export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
         echo $TAG
         docker images
-        docker tag "$IMAGE":"$GITHUB_SHA" "$REGISTRY_HOSTNAME"/"$PROJECT_NAME"/"$IMAGE":"$GITHUB_SHA"
-        docker push "$REGISTRY_HOSTNAME"/"$PROJECT_NAME"/"$IMAGE":"$GITHUB_SHA"
+        docker tag "$IMAGE_NAME":"$IMAGE_TAG" "$REGISTRY_HOSTNAME"/"$PROJECT_NAME"/"$IMAGE_NAME":"$IMAGE_TAG"
+        docker push "$REGISTRY_HOSTNAME"/"$PROJECT_NAME"/"$IMAGE_NAME":"$IMAGE_TAG"
+    - id: 'Call Humanitec'
+      name: 'Calling Humanitec API'
+      run: |-
+        curl \
+        --request POST "https://api.humanitec.io/orgs/chowworld/artefact-versions \
+        --header "Authorization: Bearer ${{ secrets.HUMANITEC_TOKEN}" \
+        --header "Content-Type: application/json" \
+        --data-raw '{ 
+        "name": "'$IMAGE_NAME'",
+        "version": "'$IMAGE_TAG'",
+        "type": "container",
+        "commit": "'$GITHUB_SHA'"
+        "ref": "'$GITHUB_REF'"
+        }'
