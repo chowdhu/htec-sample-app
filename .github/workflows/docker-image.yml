@@ -23,7 +23,7 @@ jobs:
       run: |-
         export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
         echo $TAG
-        docker build . --file Dockerfile --tag "$IMAGE":"$IMAGE_TAG"
+        docker build . --file Dockerfile --tag "$IMAGE_NAME":"$IMAGE_TAG"
     - id: 'auth'
       name: 'Authenticate to Google Cloud'
       uses: 'google-github-actions/auth@v0'
