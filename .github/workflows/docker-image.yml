@@ -10,7 +10,7 @@ env:
   GITHUB_REF: ${{ github.ref }} 
   IMAGE: frontend
   REGISTRY_HOSTNAME: gcr.io
-  PROJECT_NAME: sri-chowdhury-gcp
+  PROJECT_NAME: ${{ secrets.GCP_PROJECT }}
 jobs:
   setupbuild:
     name: "Setup Build and package and upload"
@@ -18,27 +18,27 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build the Docker image
+    - name: 'Build the Docker image'
       run: |-
         export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
         echo $TAG
-        docker build . --file Dockerfile --tag "$IMAGE":"$TAG"
+        docker build . --file Dockerfile --tag "$IMAGE":"$GITHUB_SHA"
     - id: 'auth'
       name: 'Authenticate to Google Cloud'
       uses: 'google-github-actions/auth@v0'
       with:
         credentials_json: '${{ secrets.GCR_KEY }}'
-    - name: 'Setup Cloud SDK'
+    - name: 'Setup google Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v0'
     - id: 'gloud'
-      name: 'gcloud config docker'
+      name: 'Setup docker to use gcloud auth'
       run: |-
         gcloud auth configure-docker
     - id: 'tag'
-      name: 'tag and push'
+      name: 'Tag the docker image and push to gcr'
       run: |-
         export TAG=`echo $GITHUB_REF | awk -F/ '{print $NF}'`
         echo $TAG
         docker images
-        docker tag "$IMAGE":"$TAG" "$REGISTRY_HOSTNAME"/"$PROJECT_NAME"/"$IMAGE":"$TAG"
-        docker push "$REGISTRY_HOSTNAME"/"$PROJECT_NAME"/"$IMAGE":"$TAG"
+        docker tag "$IMAGE":"$GITHUB_SHA" "$REGISTRY_HOSTNAME"/"$PROJECT_NAME"/"$IMAGE":"$GITHUB_SHA"
+        docker push "$REGISTRY_HOSTNAME"/"$PROJECT_NAME"/"$IMAGE":"$GITHUB_SHA"
