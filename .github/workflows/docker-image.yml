@@ -46,10 +46,10 @@ jobs:
     - id: 'Call Humanitec'
       name: 'Calling Humanitec API'
       run: |-
-        curl \
-        --request POST "https://api.humanitec.io/orgs/chowworld/artefact-versions \
-        --header "Authorization: Bearer ${{ secrets.HUMANITEC_TOKEN}" \
-        --header "Content-Type: application/json" \
+        curl \\
+        --request POST "https://api.humanitec.io/orgs/chowworld/artefact-versions \\
+        --header "Authorization: Bearer ${{ secrets.HUMANITEC_TOKEN}" \\
+        --header "Content-Type: application/json" \\
         --data-raw '{ 
         "name": "'$IMAGE_NAME'",
         "version": "'$IMAGE_TAG'",
