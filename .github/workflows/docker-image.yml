@@ -55,6 +55,5 @@ jobs:
             "type": "container",
             "commit": "${GITHUB_SHA}",
             "ref": "${GITHUB_REF}"
-
           }
           EOF
