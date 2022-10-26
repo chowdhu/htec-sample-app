@@ -50,7 +50,7 @@ jobs:
         --header "Content-Type: application/json" \
         -d @- <<EOF
           {
-            "name": "${REGISTRY_HOSTNAME/${PROJECT_NAME}/${IMAGE_NAME}}",
+            "name": "${REGISTRY_HOSTNAME}/${PROJECT_NAME}/${IMAGE_NAME}",
             "version": "${IMAGE_TAG}",
             "type": "container",
             "commit": "${GITHUB_SHA}",
