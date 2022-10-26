@@ -54,7 +54,7 @@ code {
   font-weight: 500;
   letter-spacing: .0125em;
   width: 100%;
-  border: none;
+  border: 1px;
   border-bottom: 1px solid #555;
   margin-bottom: 8px;
 
@@ -99,6 +99,7 @@ code {
   letter-spacing: .0178571429em;
   text-decoration: inherit;
   text-transform: inherit;
+  border: 1px;
   opacity: .6;
 }
 .error-message {
