@@ -42,10 +42,19 @@ jobs:
         echo $TAG
         docker tag "$IMAGE_NAME":"$IMAGE_TAG" "$REGISTRY_HOSTNAME"/"$PROJECT_NAME"/"$IMAGE_NAME":"$IMAGE_TAG"
         docker push "$REGISTRY_HOSTNAME"/"$PROJECT_NAME"/"$IMAGE_NAME":"$IMAGE_TAG"
-    - id: 'humaitec'
-      name: 'Calling Humanitec API'
+    - id: 'humanitec'
+      name: 'Calling Humanitec API' 
       run: |-
-        curl --request POST "https://api.humanitec.io/orgs/chowworld/artefact-versions" \
+        curl --request POST "https://api.humanitec.io/orgs/${{ secrets.HUMANITEC_ORG}}/artefact-versions" \
         --header "Authorization: Bearer ${{ secrets.HUMANITEC_TOKEN}}" \
         --header "Content-Type: application/json" \
-        --data-raw '{ "name": "'${REGISTRY_HOSTNAME}'/'${PROJECT_NAME}'/'${IMAGE_NAME}'","version": "'${IMAGE_TAG}'","type": "container","commit": "'${GITHUB_SHA}'","ref": "'${GITHUB_REF}'"}'
+        -d @- <<EOF
+          {
+            "name": "${REGISTRY_HOSTNAME/${PROJECT_NAME}/${IMAGE_NAME}}",
+            "version": "${IMAGE_TAG}",
+            "type": "container",
+            "commit": "${GITHUB_SHA}",
+            "ref": "${GITHUB_REF}"
+
+          }
+          EOF
